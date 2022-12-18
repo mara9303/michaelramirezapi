@@ -17,6 +17,9 @@ class Config
         $this->add('ROOT_DIR', dirname(dirname(__DIR__)));
         $env = new Dotenv();
         $env->loadEnv($this->getRootDir() . '/.env');
+        foreach($_ENV as $key => $value){
+            $this->add($key, $value);
+        }
     }
 
     /**
@@ -28,11 +31,19 @@ class Config
     }
 
     /**
-     * Get config directory
+     * Get app enviroment
      * @return string
      */
-    public function getEnv(){
+    public function getAppEnv(){
         return $this->get('APP_ENV');
+    }
+
+    /**
+     * Get all .env variables
+     * @return string
+     */
+    public function env($key){
+        return $this->get($key);
     }
 
     /**
@@ -41,5 +52,21 @@ class Config
      */
     public function getConfigDir(){
         return $this->getRootDir().'/config';
+    }
+
+    /**
+     * Get data base path
+     * @return string
+     */
+    public function getDataBasePath(){
+        return $_ENV['PATH_TO_SQLITE_FILE'];
+    }
+
+    /**
+     * Get data base path
+     * @return string
+     */
+    public function helper($name){
+        return include dirname(__DIR__)."/Helpers/${name}_helper.php";
     }
 }

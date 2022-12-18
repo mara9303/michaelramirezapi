@@ -2,48 +2,45 @@
 namespace MichaelRamirezApi\Controllers;
 
 use Exception;
-use MichaelRamirezApi\Utils\ReturnResponse;
+use MessageFormatter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-class TaskController{
-
-    private $returnResponse;
-
-    public function __construct(){
-        $this->returnResponse = new ReturnResponse();
-    }
+class TaskController extends BaseController{
 
     /**
-     * Get rows
+     * Get tasks
      * @return void
      */
     public function index(Request $request){
         try {
-            $task = $request->get('task');
-            $data = array(
-                1 => "Primero",
-                2 => "Segundo",
-                3 => "Tercero",
-                4 => "Cuarto",
-                5 => "Quinto"
-            );
+            $task = (int)$request->get('task');
+            $data = $this->model->get($task);
 
-            if ($task > 0)
-                $data = $data[$task];
-
-            $this->returnResponse->setData(array("task" => $data));
-            $this->returnResponse->setStatus('success');
+            if($data->success()){
+                $this->returnResponse->setData(array("tasks" => $data->getData()));
+                $this->returnResponse->setStatus($data->getStatus());
+            }else{
+                $this->returnResponse->setMessage($data->getMessage());
+                $this->returnResponse->setStatus($data->getStatus());
+            }
 
         } catch (Exception $ex) {
             $this->returnResponse->setMessage("Error: " . $ex->getMessage() . ", code " . $ex->getCode());
             $this->returnResponse->setStatus('error');
         }
 
-        if($this->returnResponse->getStatus() == 'error')
+        if($this->returnResponse->error())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
+                ['content-type' => 'application/json']
+            );
+        elseif($this->returnResponse->fail())
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_BAD_REQUEST,
                 ['content-type' => 'application/json']
             );
         else
@@ -52,43 +49,127 @@ class TaskController{
                 Response::HTTP_OK,
                 ['content-type' => 'application/json']
             );
-        
+
         $response->send();
     }
 
+    /**
+     * Store tasks
+     * @return void
+     */
     public function store(Request $request){
-        $data = array(1,2,3,4,5);
-       
-        $response = new Response(
-            json_encode($data),
-            Response::HTTP_OK,
-            ['content-type' => 'application/json']
-        );
-        
+        try {
+            $this->config->helper("tasks");
+            $task = tasks_parse_request(json_decode($request->getContent()));
+            
+            $data = $this->model->store($task);
+           
+            $this->returnResponse->setStatus($data->getStatus());
+            $this->returnResponse->setMessage($data->getMessage());
+
+        } catch (Exception $ex) {
+            $this->returnResponse->setMessage("Error: " . $ex->getMessage() . ", code " . $ex->getCode());
+            $this->returnResponse->setStatus('error');
+        }
+
+        if($this->returnResponse->error())
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                ['content-type' => 'application/json']
+            );
+        elseif($this->returnResponse->fail())
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        else
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_OK,
+                ['content-type' => 'application/json']
+            );
+
         $response->send();
     }
 
+    /**
+     * Update tasks
+     * @return void
+     */
     public function update(Request $request){
-        $data = array(1,2,3,4,5);
-       
-        $response = new Response(
-            json_encode($data),
-            Response::HTTP_OK,
-            ['content-type' => 'application/json']
-        );
-        
+        try {
+            /*dump("update");
+            die;*/
+            $this->config->helper("tasks");
+            $task = tasks_parse_request(json_decode($request->getContent()));
+            
+            $taskId = (int)$request->get('task');
+            $data = $this->model->update($taskId, $task);
+
+            $this->returnResponse->setStatus($data->getStatus());
+            $this->returnResponse->setMessage($data->getMessage());
+
+        } catch (Exception $ex) {
+            $this->returnResponse->setMessage("Error: " . $ex->getMessage() . ", code " . $ex->getCode());
+            $this->returnResponse->setStatus('error');
+        }
+
+        if($this->returnResponse->error())
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                ['content-type' => 'application/json']
+            );
+        elseif($this->returnResponse->fail())
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        else
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_OK,
+                ['content-type' => 'application/json']
+            );
+
         $response->send();
     }
 
-    public function delete($task){
-        $data = array(1,2,3,4,5);
-       
-        $response = new Response(
-            json_encode($data),
-            Response::HTTP_OK,
-            ['content-type' => 'application/json']
-        );
-        
+    public function delete(Request $request){
+        try {
+            $task = (int)$request->get('task');
+            $data = $this->model->delete($task);
+
+            $this->returnResponse->setStatus($data->getStatus());
+            $this->returnResponse->setMessage($data->getMessage());
+            
+        } catch (Exception $ex) {
+            $this->returnResponse->setMessage("Error: " . $ex->getMessage() . ", code " . $ex->getCode());
+            $this->returnResponse->setStatus('error');
+        }
+
+        if($this->returnResponse->error())
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                ['content-type' => 'application/json']
+            );
+        elseif($this->returnResponse->fail())
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_BAD_REQUEST,
+                ['content-type' => 'application/json']
+            );
+        else
+            $response = new Response(
+                $this->returnResponse->getObject(true),
+                Response::HTTP_OK,
+                ['content-type' => 'application/json']
+            );
+
         $response->send();
     }
 }

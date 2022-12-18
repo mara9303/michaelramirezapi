@@ -12,7 +12,7 @@ class ReturnResponse
 
     public function __construct(){
         $this->data = array();
-        $this->status = 'error';
+        $this->status = '';
         $this->message = '';
     }
 
@@ -90,5 +90,26 @@ class ReturnResponse
             return json_encode($returnResponse);
         else
 		    return $returnResponse;
+	}
+	
+	/**
+	 * @return mixed
+	 */
+	public function success() {
+		return $this->status == 'success' ? true : false;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function error() {
+		return $this->status == 'error' ? true : false;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function fail() {
+		return $this->status == 'fail' ? true : false;
 	}
 }
