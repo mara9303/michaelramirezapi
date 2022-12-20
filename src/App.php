@@ -42,26 +42,34 @@ class App{
     private $db;
 
     private function __construct(){
-        $this->config = Config::create();
-        $loader = new PhpFileLoader(new FileLocator());
-        $this->routes = $loader->load($this->config->getConfigDir() . '/routes.php');
-        $this->request = Request::createFromGlobals();
-        /*dump($this->request->getUri());
-        die;
-        $this->request->getBaseUrl().$this->request->getPathInfo(), $this->request->server->parameters['REQUEST_METHOD']*/
-        $this->context = new RequestContext();
-        $this->returnResponse = new ReturnResponse();
-        $this->pdo = SQLiteConnection::create();
-        
-        /*Load Database Config */
-        if ( !file_exists($file_path = dirname(__DIR__) .'/config/databases.php'))
-        {
-            throw new \ErrorException('The configuration file config/databases.php does not exist.');
+        try {
+            $this->config = Config::create();
+            $loader = new PhpFileLoader(new FileLocator());
+            $this->routes = $loader->load($this->config->getConfigDir() . '/routes.php');
+            $this->request = Request::createFromGlobals();
+            /*dump($this->request->getUri());
+            die;
+            $this->request->getBaseUrl().$this->request->getPathInfo(), $this->request->server->parameters['REQUEST_METHOD']*/
+            $this->context = new RequestContext();
+            $this->returnResponse = new ReturnResponse();
+            $this->pdo = SQLiteConnection::create();
+
+            /*Load Database Config */
+            if (!file_exists($file_path = dirname(__DIR__) . '/config/databases.php')) {
+                throw new \ErrorException('The configuration file config/databases.php does not exist.');
+            }
+
+            include($file_path);
+
+            $this->db = DB::getConnetion($config['type'], $config['database']);
+
+            //Load helper
+            $this->config->helper('permission');
+        }catch(Exception $ex){
+            echo $ex->getMessage() . ' - ' . $ex->getCode();
+            echo $ex->getTraceAsString();
+            die;
         }
-
-        include($file_path);
-
-        $this->db = DB::getConnetion($config['type'], $config['database']);
     }
 
     public function getConfig(){
@@ -87,7 +95,7 @@ class App{
                     ['content-type' => 'application/json']
                 );
             } else {
-                if($this->request->headers->get('apiToken') == $this->config->env('API_TOKEN')){
+                if(permission_validate_api_token_exist($this->request->headers->get('apiToken'))){
                     $this->returnResponse->setStatus('success');
                 }else{
                     $this->returnResponse->setMessage("Access not allowed: apiToken not found.");

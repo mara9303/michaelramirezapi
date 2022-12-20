@@ -16,6 +16,9 @@ class BaseModel{
     /**  @var string */
     protected $table;
 
+	/**  @var array */
+    protected $joins;
+
     /**  @var string/array */
     protected $columns;
     /**  @var array */
@@ -30,6 +33,7 @@ class BaseModel{
         $this->table = "";
         $this->columns = "";
         $this->where = [];
+		$this->joins = [];
     }
 
 	/**
@@ -83,6 +87,24 @@ class BaseModel{
 	 */
 	public function setWhere($where): self {
 		$this->where = $where;
+		return $this;
+	}
+
+	/**
+	 * 
+	 * @return array
+	 */
+	public function getJoins() {
+		return $this->joins;
+	}
+	
+	/**
+	 * 
+	 * @param array $joins 
+	 * @return self
+	 */
+	public function setJoins($joins): self {
+		$this->joins = $joins;
 		return $this;
 	}
 }

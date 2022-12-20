@@ -30,5 +30,7 @@ class BaseController {
         $this->config = $app->getConfig();
         $this->db = $app->getConnection2();
         $this->returnResponse = new ReturnResponse();
+
+        $this->config->helper('permission');
     }
 }

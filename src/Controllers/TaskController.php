@@ -1,4 +1,5 @@
 <?php
+
 namespace MichaelRamirezApi\Controllers;
 
 use Exception;
@@ -7,37 +8,46 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class TaskController extends BaseController{
+class TaskController extends BaseController
+{
 
     /**
      * Get tasks
      * @return void
      */
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         try {
-            $task = (int)$request->get('task');
-            $data = $this->model->get($task);
+            if (
+                permission_validate_api_token_can(
+                    ["READ", "ALL"], 
+                    $request->headers->get('apiToken')
+                )
+            ) {
 
-            if($data->success()){
-                $this->returnResponse->setData(array("tasks" => $data->getData()));
-                $this->returnResponse->setStatus($data->getStatus());
-            }else{
-                $this->returnResponse->setMessage($data->getMessage());
-                $this->returnResponse->setStatus($data->getStatus());
+                $task = (int)$request->get('task');
+                $data = $this->model->get($task);
+
+                if ($data->success()) {
+                    $this->returnResponse->setData(array("tasks" => $data->getData()));
+                    $this->returnResponse->setStatus($data->getStatus());
+                } else {
+                    $this->returnResponse->setMessage($data->getMessage());
+                    $this->returnResponse->setStatus($data->getStatus());
+                }
             }
-
         } catch (Exception $ex) {
             $this->returnResponse->setMessage("Error: " . $ex->getMessage() . ", code " . $ex->getCode());
             $this->returnResponse->setStatus('error');
         }
 
-        if($this->returnResponse->error())
+        if ($this->returnResponse->error())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 ['content-type' => 'application/json']
             );
-        elseif($this->returnResponse->fail())
+        elseif ($this->returnResponse->fail())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_BAD_REQUEST,
@@ -57,28 +67,35 @@ class TaskController extends BaseController{
      * Store tasks
      * @return void
      */
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         try {
-            $this->config->helper("tasks");
-            $task = tasks_parse_request(json_decode($request->getContent()));
-            
-            $data = $this->model->store($task);
-           
-            $this->returnResponse->setStatus($data->getStatus());
-            $this->returnResponse->setMessage($data->getMessage());
+            if (
+                permission_validate_api_token_can(
+                    ["WRITE", "ALL"],
+                    $request->headers->get('apiToken')
+                )
+            ) {
+                $this->config->helper("tasks");
+                $task = tasks_parse_request(json_decode($request->getContent()));
 
+                $data = $this->model->store($task);
+
+                $this->returnResponse->setStatus($data->getStatus());
+                $this->returnResponse->setMessage($data->getMessage());
+            }
         } catch (Exception $ex) {
             $this->returnResponse->setMessage("Error: " . $ex->getMessage() . ", code " . $ex->getCode());
             $this->returnResponse->setStatus('error');
         }
 
-        if($this->returnResponse->error())
+        if ($this->returnResponse->error())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 ['content-type' => 'application/json']
             );
-        elseif($this->returnResponse->fail())
+        elseif ($this->returnResponse->fail())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_BAD_REQUEST,
@@ -98,31 +115,36 @@ class TaskController extends BaseController{
      * Update tasks
      * @return void
      */
-    public function update(Request $request){
+    public function update(Request $request)
+    {
         try {
-            /*dump("update");
-            die;*/
-            $this->config->helper("tasks");
-            $task = tasks_parse_request(json_decode($request->getContent()));
-            
-            $taskId = (int)$request->get('task');
-            $data = $this->model->update($taskId, $task);
+            if (
+                permission_validate_api_token_can(
+                    ["WRITE", "ALL"],
+                    $request->headers->get('apiToken')
+                )
+            ) {
+                $this->config->helper("tasks");
+                $task = tasks_parse_request(json_decode($request->getContent()));
 
-            $this->returnResponse->setStatus($data->getStatus());
-            $this->returnResponse->setMessage($data->getMessage());
+                $taskId = (int) $request->get('task');
+                $data = $this->model->update($taskId, $task);
 
+                $this->returnResponse->setStatus($data->getStatus());
+                $this->returnResponse->setMessage($data->getMessage());
+            }
         } catch (Exception $ex) {
             $this->returnResponse->setMessage("Error: " . $ex->getMessage() . ", code " . $ex->getCode());
             $this->returnResponse->setStatus('error');
         }
 
-        if($this->returnResponse->error())
+        if ($this->returnResponse->error())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 ['content-type' => 'application/json']
             );
-        elseif($this->returnResponse->fail())
+        elseif ($this->returnResponse->fail())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_BAD_REQUEST,
@@ -138,26 +160,33 @@ class TaskController extends BaseController{
         $response->send();
     }
 
-    public function delete(Request $request){
+    public function delete(Request $request)
+    {
         try {
-            $task = (int)$request->get('task');
-            $data = $this->model->delete($task);
+            if (
+                permission_validate_api_token_can(
+                    ["WRITE", "ALL"],
+                    $request->headers->get('apiToken')
+                )
+            ) {
+                $task = (int) $request->get('task');
+                $data = $this->model->delete($task);
 
-            $this->returnResponse->setStatus($data->getStatus());
-            $this->returnResponse->setMessage($data->getMessage());
-            
+                $this->returnResponse->setStatus($data->getStatus());
+                $this->returnResponse->setMessage($data->getMessage());
+            }
         } catch (Exception $ex) {
             $this->returnResponse->setMessage("Error: " . $ex->getMessage() . ", code " . $ex->getCode());
             $this->returnResponse->setStatus('error');
         }
 
-        if($this->returnResponse->error())
+        if ($this->returnResponse->error())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 ['content-type' => 'application/json']
             );
-        elseif($this->returnResponse->fail())
+        elseif ($this->returnResponse->fail())
             $response = new Response(
                 $this->returnResponse->getObject(true),
                 Response::HTTP_BAD_REQUEST,
