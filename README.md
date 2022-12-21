@@ -21,7 +21,7 @@ php bin/execute create:tables
 Se creó un archivo de respaldo para las variables de ambiente del proyecto llamado .env.example, por favor copie y pegue este archivo y lo renombra a .env; una vez hecho se deben configurar las variables
 
 ```bash
-DB_NAME='Ubicación de nuestra base de datos sqlite'
+DB_NAME='Ubicación de nuestra base de datos sqlite, por defecto en la carpeta ubicada en la raíz db/'
 API_TOKEN='Nuestro token con full acceso'
 API_TOKEN_READ='Nuestro token con permisos de lectura solamente'
 ```
