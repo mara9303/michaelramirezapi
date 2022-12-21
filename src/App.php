@@ -103,6 +103,7 @@ class App{
                     ['content-type' => 'application/json']
                 );
             } else {
+                
                 if(permission_validate_api_token_exist($this->request->headers->get('apiToken'))){
                     $this->returnResponse->setStatus('success');
                 }else{
