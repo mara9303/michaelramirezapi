@@ -92,8 +92,6 @@ class App{
 
     public function run(){
         try {
-            /*dump($this->db->pdo);
-            die;*/
             if(!isset($this->db->pdo)){
                 $this->returnResponse->setMessage("Could not connect to the database. Please review the DB_NAME enviroment variable.");
                 $this->returnResponse->setStatus('fail');
@@ -161,7 +159,7 @@ class App{
             );
         } catch (Exception $ex) {
             //$response = new Response('An error occurred', 500);
-            $this->returnResponse->setMessage("An error occurred");
+            $this->returnResponse->setMessage("An error occurred: " . $ex->getMessage());
             $this->returnResponse->setStatus('error');
             $response = new Response(
                 $this->returnResponse->getObject(true),
