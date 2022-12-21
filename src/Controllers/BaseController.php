@@ -28,7 +28,7 @@ class BaseController {
 
         $this->model = new $namespaceModel();
         $this->config = $app->getConfig();
-        $this->db = $app->getConnection2();
+        $this->db = $app->getMedooConnection();
         $this->returnResponse = new ReturnResponse();
 
         $this->config->helper('permission');

@@ -59,7 +59,7 @@ class Config
      * @return string
      */
     public function getDataBasePath(){
-        return $_ENV['PATH_TO_SQLITE_FILE'];
+        return $_ENV['DB_NAME'];
     }
 
     /**

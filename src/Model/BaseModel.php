@@ -27,7 +27,7 @@ class BaseModel{
     public function __construct()
     {
         $app = App::create();
-        $this->db = $app->getConnection2();
+        $this->db = $app->getMedooConnection();
 		$this->config = $app->getConfig();
         $this->returnResponse = new ReturnResponse();
         $this->table = "";

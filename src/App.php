@@ -47,9 +47,6 @@ class App{
             $loader = new PhpFileLoader(new FileLocator());
             $this->routes = $loader->load($this->config->getConfigDir() . '/routes.php');
             $this->request = Request::createFromGlobals();
-            /*dump($this->request->getUri());
-            die;
-            $this->request->getBaseUrl().$this->request->getPathInfo(), $this->request->server->parameters['REQUEST_METHOD']*/
             $this->context = new RequestContext();
             $this->returnResponse = new ReturnResponse();
             $this->pdo = SQLiteConnection::create();
@@ -66,8 +63,17 @@ class App{
             //Load helper
             $this->config->helper('permission');
         }catch(Exception $ex){
-            echo $ex->getMessage() . ' - ' . $ex->getCode();
-            echo $ex->getTraceAsString();
+            $returnResponse = new ReturnResponse();
+            $returnResponse->setData(["trace" => $ex->getTraceAsString()]);
+            $returnResponse->setMessage($ex->getMessage() . ' - ' . $ex->getCode());
+            $returnResponse->setStatus('error');
+            
+            $response = new Response(
+                $returnResponse->getObject(true),
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                ['content-type' => 'application/json']
+            );
+            $response->send();
             die;
         }
     }
@@ -80,14 +86,16 @@ class App{
         return $this->pdo;
     }
 
-    public function getConnection2(){
+    public function getMedooConnection(){
         return $this->db;
     }
 
     public function run(){
         try {
-            if($this->pdo->connect($this->config->env('PATH_TO_SQLITE_FILE')) == null){
-                $this->returnResponse->setMessage("Could not connect to the database. Please review the PATH_TO_SQLITE_FILE enviroment variable.");
+            /*dump($this->db->pdo);
+            die;*/
+            if(!isset($this->db->pdo)){
+                $this->returnResponse->setMessage("Could not connect to the database. Please review the DB_NAME enviroment variable.");
                 $this->returnResponse->setStatus('fail');
                 $response = new Response(
                     $this->returnResponse->getObject(true),
@@ -160,7 +168,6 @@ class App{
                 ['content-type' => 'application/json']
             );
         }  finally {
-            $this->pdo->close();
             $response->send();
         }
     }

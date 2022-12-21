@@ -3,10 +3,8 @@
 namespace MichaelRamirezApi\Controllers;
 
 use Exception;
-use MessageFormatter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class TaskController extends BaseController
 {
