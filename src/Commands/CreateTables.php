@@ -3,7 +3,8 @@
 namespace MichaelRamirezApi\Commands;
 
 use Exception;
-use MichaelRamirezApi\App;
+use MichaelRamirezApi\Utils\Config;
+use MichaelRamirezApi\Utils\SQLiteConnection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,9 +35,8 @@ class CreateTables extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $app = App::create();
-        $config = $app->getConfig();
-        $pdo = $app->getConnection();
+        $config = Config::create();
+        $pdo = SQLiteConnection::create();
         $dbConnetion = $pdo->connect($config->getDataBasePath());
         $io = new SymfonyStyle($input, $output);
         $commands = ['CREATE TABLE IF NOT EXISTS "tasks" (
