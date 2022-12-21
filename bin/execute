@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+use MichaelRamirezApi\Commands\CreateTokens;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -10,4 +11,5 @@ $application = new Application();
 
 // ... register commands
 $application->add(new CreateTables());
+$application->add(new CreateTokens());
 $application->run();
