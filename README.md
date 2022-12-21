@@ -55,6 +55,8 @@ El api está configurado para funcionar de la siguiente manera:
 ```
 
 ## Comentarios
+Dentro del repositorio se encuentra la colección de postman llamada **MICHAELRAMIREZAPI.postman_collection.json**.
+
 Espero que la lectura del código sea sencilla, cualquier retroalimentación es bien recibida.
     
 ## Autor
