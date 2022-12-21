@@ -17,6 +17,7 @@ php bin/execute create:tables
 ```
 
 3.Configuración de variables
+
 Se creó un archivo de respaldo para las variables de ambiente del proyecto llamado .env.example, por favor copie y pegue este archivo y lo renombra a .env; una vez hecho se deben configurar las variables
 
 ```bash
