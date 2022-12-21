@@ -37,7 +37,6 @@ class CreateTokens extends Command
     {
         $config = Config::create();
         $pdo = SQLiteConnection::create();
-        $dbConnetion = $pdo->connect($config->getDataBasePath());
         $io = new SymfonyStyle($input, $output);
         try {
             $envFile = file_get_contents($config->getRootDir() . '/.env');
